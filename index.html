@@ -21,46 +21,179 @@ body {
 
 /* PRODUCTS */
 .products {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 20px;
     padding: 20px;
+}
+
+.card {
+    background: white;
+    padding: 15px;
+    border-radius: 5px;
     text-align: center;
 }
 
-.product-card {
-    background: white;
-    padding: 15px;
-    margin: 10px;
-    display: inline-block;
-    width: 250px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+button {
+    background: #ffd814;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
 }
 
-.product-card img {
+/* CART */
+.cart {
+    position: fixed;
+    right: 0;
+    top: 60px;
+    width: 300px;
+    background: white;
+    height: 100%;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+input {
     width: 100%;
-    border-radius: 10px;
+    padding: 5px;
+    margin: 5px 0;
 }
 </style>
-
 </head>
 
 <body>
 
-<!-- NAVBAR -->
 <div class="navbar">
-    <h2>Sikarwar Sweets</h2>
-    <div>Home | Menu | Contact</div>
+    <div>🍬 Sikarwar Sweets</div>
+    <div>Cart 🛒 (<span id="count">0</span>)</div>
 </div>
 
-<!-- PRODUCTS -->
-<div class="products">
+<div class="products" id="products"></div>
 
-    <div class="product-card">
-        <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950" alt="Sweets Image">
-        <h3>Fresh Sweets</h3>
-        <p>Delicious Indian traditional sweets</p>
-    </div>
+<div class="cart">
+    <h3>Cart</h3>
+    <div id="cart-items"></div>
+    <h4>Total: ₹<span id="total">0</span></h4>
 
+    <h4>Checkout</h4>
+    <input id="name" placeholder="Your Name">
+    <input id="address" placeholder="Address">
+    <input id="phone" placeholder="Phone Number">
+
+    <button onclick="placeOrder()">Place Order</button>
 </div>
+
+<script>
+let products = [
+{name:"Gulab Jamun",price:200},
+{name:"Rasgulla",price:180},
+{name:"Kaju Katli",price:800},
+{name:"Ladoo",price:150},
+{name:"Barfi",price:300},
+{name:"Jalebi",price:120},
+{name:"Milk Cake",price:400},
+{name:"Soan Papdi",price:250},
+{name:"Peda",price:220},
+{name:"Imarti",price:160},
+{name:"Halwa",price:200},
+{name:"Khoya Sweet",price:350}
+];
+
+let cart = [];
+
+function showProducts(){
+let html="";
+products.forEach((p,i)=>{
+html+=`
+<div class="card">
+<h3>${p.name}</h3>
+<p>₹${p.price}</p>
+<select id="weight-${i}">
+  <option value="0.25">250g</option>
+  <option value="0.5">500g</option>
+  <option value="1">1 kg</option>
+</select>
+
+<button onclick="add(${i})">Add to Cart</button>
+</div>`;
+});
+document.getElementById("products").innerHTML=html;
+}
+
+function add(i){
+let item = products[i];
+let weight = parseFloat(document.getElementById(`weight-${i}`).value);
+
+let found = cart.find(c => c.name === item.name && c.weight === weight);
+
+if(found){
+    found.qty++;
+}else{
+    cart.push({
+        ...item,
+        qty:1,
+        weight:weight
+    });
+}
+
+update();
+}
+
+function update(){
+let total=0;
+let html="";
+cart.forEach((item,i)=>{
+total+=item.price*item.qty;
+
+html+=`
+<div>
+${item.name} (${item.weight}kg) x${item.qty} = ₹${item.price * item.weight * item.qty}
+<button onclick="change(${i},1)">+</button>
+<button onclick="change(${i},-1)">-</button>
+</div>`;
+});
+
+document.getElementById("cart-items").innerHTML=html;
+document.getElementById("total").innerText=total;
+document.getElementById("count").innerText=cart.length;
+}
+
+function change(i,val){
+cart[i].qty+=val;
+if(cart[i].qty<=0) cart.splice(i,1);
+update();
+}
+
+function placeOrder(){
+let name=document.getElementById("name").value;
+let address=document.getElementById("address").value;
+let phone=document.getElementById("phone").value;
+
+if(!name || !address || !phone){
+alert("Fill all details");
+return;
+}
+
+let message = "New Order - Sikarwar Sweets%0A";
+message += "Name: "+name+"%0A";
+message += "Address: "+address+"%0A";
+message += "Phone: "+phone+"%0A%0A";
+
+cart.forEach(item=>{
+message += item.name+" ("+item.weight+"kg) x"+item.qty+" = ₹"+(item.price*item.weight*item.qty)+"%0A";
+});
+
+let total = cart.reduce((sum,item)=>sum+(item.price*item.weight*item.qty),0);
+message += "%0ATotal: ₹"+total;
+
+// 🔥 CHANGE THIS NUMBER
+let url = "https://wa.me/9911132308?text="+message;
+
+window.open(url,"_blank");
+}
+
+showProducts();
+</script>
 
 </body>
 </html>
