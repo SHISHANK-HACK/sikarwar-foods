@@ -108,6 +108,12 @@ html+=`
 <div class="card">
 <h3>${p.name}</h3>
 <p>₹${p.price}</p>
+<select id="weight-${i}">
+  <option value="0.25">250g</option>
+  <option value="0.5">500g</option>
+  <option value="1">1 kg</option>
+</select>
+
 <button onclick="add(${i})">Add to Cart</button>
 </div>`;
 });
@@ -115,14 +121,21 @@ document.getElementById("products").innerHTML=html;
 }
 
 function add(i){
-let item=products[i];
-let found=cart.find(c=>c.name===item.name);
+let item = products[i];
+let weight = parseFloat(document.getElementById(`weight-${i}`).value);
+
+let found = cart.find(c => c.name === item.name && c.weight === weight);
 
 if(found){
-found.qty++;
+    found.qty++;
 }else{
-cart.push({...item,qty:1});
+    cart.push({
+        ...item,
+        qty:1,
+        weight:weight
+    });
 }
+
 update();
 }
 
@@ -134,7 +147,7 @@ total+=item.price*item.qty;
 
 html+=`
 <div>
-${item.name} x${item.qty} = ₹${item.price*item.qty}
+${item.name} (${item.weight}kg) x${item.qty} = ₹${item.price * item.weight * item.qty}
 <button onclick="change(${i},1)">+</button>
 <button onclick="change(${i},-1)">-</button>
 </div>`;
@@ -167,10 +180,10 @@ message += "Address: "+address+"%0A";
 message += "Phone: "+phone+"%0A%0A";
 
 cart.forEach(item=>{
-message += item.name+" x"+item.qty+" = ₹"+(item.price*item.qty)+"%0A";
+message += item.name+" ("+item.weight+"kg) x"+item.qty+" = ₹"+(item.price*item.weight*item.qty)+"%0A";
 });
 
-let total = cart.reduce((sum,item)=>sum+(item.price*item.qty),0);
+let total = cart.reduce((sum,item)=>sum+(item.price*item.weight*item.qty),0);
 message += "%0ATotal: ₹"+total;
 
 // 🔥 CHANGE THIS NUMBER
