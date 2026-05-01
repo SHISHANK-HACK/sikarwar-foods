@@ -85,18 +85,17 @@ input {
 
 <script>
 let products = [
-{name:"Gulab Jamun",price:200,img:"images/gulab.jpg"},
-{name:"Rasgulla",price:180,img:"https://upload.wikimedia.org/wikipedia/commons/9/9b/Rasgulla.jpg"},
+{name:"Gulab Jamun",price:250,img:"images/gulab.jpg"},
+{name:"Rasgulla",price:220,img:"https://upload.wikimedia.org/wikipedia/commons/9/9b/Rasgulla.jpg"},
 {name:"Kaju Katli",price:800,img:"https://upload.wikimedia.org/wikipedia/commons/5/5a/Kaju_katli.jpg"},
-{name:"Ladoo",price:150,img:"https://upload.wikimedia.org/wikipedia/commons/4/4b/Boondi_Ladoo.jpg"},
-{name:"Barfi",price:300,img:"https://upload.wikimedia.org/wikipedia/commons/2/20/Barfi.jpg"},
-{name:"Jalebi",price:120,img:"https://upload.wikimedia.org/wikipedia/commons/9/9c/Jalebi.jpg"},
+{name:"Ladoo",price:180,img:"https://upload.wikimedia.org/wikipedia/commons/4/4b/Boondi_Ladoo.jpg"},
+{name:"Barfi",price:350,img:"https://upload.wikimedia.org/wikipedia/commons/2/20/Barfi.jpg"},
 {name:"Milk Cake",price:400,img:"https://upload.wikimedia.org/wikipedia/commons/7/7d/Milk_cake.jpg"},
 {name:"Soan Papdi",price:250,img:"https://upload.wikimedia.org/wikipedia/commons/0/0b/Soan_Papdi.jpg"},
-{name:"Peda",price:220,img:"https://upload.wikimedia.org/wikipedia/commons/3/3a/Peda.jpg"},
-{name:"Imarti",price:160,img:"https://upload.wikimedia.org/wikipedia/commons/8/8c/Imarti.jpg"},
-{name:"Halwa",price:200,img:"https://upload.wikimedia.org/wikipedia/commons/3/3e/Halwa.jpg"},
-{name:"Khoya Sweet",price:350,img:"https://upload.wikimedia.org/wikipedia/commons/6/6f/Khoya_sweets.jpg"}
+{name:"Rewari Barfi",price:320,img:"https://upload.wikimedia.org/wikipedia/commons/3/3a/Peda.jpg"},
+{name:"Kalakand",price:400,img:"https://upload.wikimedia.org/wikipedia/commons/8/8c/Imarti.jpg"},
+{name:"Doda Barfi",price:400,img:"https://upload.wikimedia.org/wikipedia/commons/3/3e/Halwa.jpg"},
+{name:"Kaju Patisa",price:350,img:"https://upload.wikimedia.org/wikipedia/commons/6/6f/Khoya_sweets.jpg"}
 ];
 
 let cart = [];
@@ -113,6 +112,7 @@ html+=`
   <option value="0.25">250g</option>
   <option value="0.5">500g</option>
   <option value="1">1 kg</option>
+  <option value="5">5 kg</option>
 </select>
 
 <button onclick="add(${i})">Add to Cart</button>
