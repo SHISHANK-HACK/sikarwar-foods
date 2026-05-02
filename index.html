@@ -4,59 +4,111 @@
 <title>Sikarwar Sweets</title>
 
 <style>
-body {
-    margin: 0;
-    font-family: Arial;
-    background: #eaeded;
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+    font-family:'Segoe UI',sans-serif;
+    background: linear-gradient(135deg,#fff1eb,#ace0f9);
 }
 
 /* NAVBAR */
-.navbar {
-    background: #131921;
-    color: white;
-    padding: 15px;
-    display: flex;
-    justify-content: space-between;
+.navbar{
+    display:flex;
+    justify-content:space-between;
+    padding:15px 25px;
+    background:rgba(0,0,0,0.85);
+    color:white;
+    position:sticky;
+    top:0;
+    z-index:10;
+}
+
+/* HERO */
+.hero{
+    text-align:center;
+    padding:50px 20px;
+}
+.hero h1{
+    font-size:42px;
+}
+
+/* SEARCH */
+.search input{
+    width:320px;
+    padding:12px;
+    border-radius:25px;
+    border:none;
+    margin-top:10px;
 }
 
 /* PRODUCTS */
-.products {
-    display: grid;
-    grid-template-columns: repeat(4,1fr);
-    gap: 20px;
-    padding: 20px;
+.products{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+    padding:20px;
 }
 
-.card {
-    background: white;
-    padding: 15px;
-    border-radius: 5px;
-    text-align: center;
+/* CARD */
+.card{
+    background:white;
+    border-radius:15px;
+    padding:15px;
+    text-align:center;
+    box-shadow:0 6px 20px rgba(0,0,0,0.15);
+    transition:.3s;
+}
+.card:hover{transform:translateY(-6px)}
+
+.card img{
+    width:100%;
+    height:160px;
+    object-fit:cover;
+    border-radius:10px;
 }
 
-button {
-    background: #ffd814;
-    border: none;
-    padding: 8px;
-    cursor: pointer;
+/* BUTTON */
+button{
+    background: linear-gradient(45deg,#ff6a00,#ff3c00);
+    color:white;
+    border:none;
+    padding:8px 12px;
+    border-radius:6px;
+    cursor:pointer;
+    margin:3px;
 }
 
 /* CART */
-.cart {
-    position: fixed;
-    right: 0;
-    top: 60px;
-    width: 300px;
-    background: white;
-    height: 100%;
-    padding: 10px;
-    overflow-y: auto;
+.cart{
+    position:fixed;
+    right:-350px;
+    top:0;
+    width:350px;
+    height:100%;
+    background:white;
+    padding:15px;
+    transition:.4s;
+    overflow-y:auto;
+}
+.cart.active{right:0}
+
+.cart-item{
+    margin-bottom:10px;
+    border-bottom:1px solid #ddd;
 }
 
-input {
-    width: 100%;
-    padding: 5px;
-    margin: 5px 0;
+/* INPUT */
+input{
+    width:100%;
+    padding:8px;
+    margin:5px 0;
+}
+
+/* MOBILE */
+@media(max-width:600px){
+.products{grid-template-columns:1fr;}
+.cart{width:100%;}
+.search input{width:90%;}
 }
 </style>
 </head>
@@ -64,136 +116,230 @@ input {
 <body>
 
 <div class="navbar">
-    <div>🍬 Sikarwar Sweets</div>
-    <div>Cart 🛒 (<span id="count">0</span>)</div>
+    🍬 Sikarwar Sweets | Since 2024
+    <div onclick="toggleCart()" style="cursor:pointer">
+        🛒 (<span id="count">0</span>)
+    </div>
+</div>
+
+<div class="hero">
+    <h1>Delicious Indian Sweets</h1>
+    <p>Order your favourite mithai online</p>
+
+    <div class="search">
+        <input placeholder="Search sweets..." oninput="search(this.value)">
+    </div>
 </div>
 
 <div class="products" id="products"></div>
 
-<div class="cart">
-    <h3>Cart</h3>
+<div class="cart" id="cart">
+    <h2>Your Cart</h2>
     <div id="cart-items"></div>
-    <h4>Total: ₹<span id="total">0</span></h4>
+    <h3>Total: ₹<span id="total">0</span></h3>
 
-    <h4>Checkout</h4>
-    <input id="name" placeholder="Your Name">
+    <h3>Checkout</h3>
+    <input id="name" placeholder="Name">
     <input id="address" placeholder="Address">
-    <input id="phone" placeholder="Phone Number">
+    <input id="phone" placeholder="Phone">
 
-    <button onclick="placeOrder()">Place Order</button>
-</div>
+<h3>Payment Method</h3>
 
-<script>
-let products = [
-{name:"Gulab Jamun",price:250,img:"images/gulab.jpg"},
-{name:"Rasgulla",price:220,img:"https://upload.wikimedia.org/wikipedia/commons/9/9b/Rasgulla.jpg"},
-{name:"Kaju Katli",price:800,img:"https://upload.wikimedia.org/wikipedia/commons/5/5a/Kaju_katli.jpg"},
-{name:"Ladoo",price:180,img:"https://upload.wikimedia.org/wikipedia/commons/4/4b/Boondi_Ladoo.jpg"},
-{name:"Barfi",price:350,img:"https://upload.wikimedia.org/wikipedia/commons/2/20/Barfi.jpg"},
-{name:"Milk Cake",price:400,img:"https://upload.wikimedia.org/wikipedia/commons/7/7d/Milk_cake.jpg"},
-{name:"Soan Papdi",price:250,img:"https://upload.wikimedia.org/wikipedia/commons/0/0b/Soan_Papdi.jpg"},
-{name:"Rewari Barfi",price:320,img:"https://upload.wikimedia.org/wikipedia/commons/3/3a/Peda.jpg"},
-{name:"Kalakand",price:400,img:"https://upload.wikimedia.org/wikipedia/commons/8/8c/Imarti.jpg"},
-{name:"Doda Barfi",price:400,img:"https://upload.wikimedia.org/wikipedia/commons/3/3e/Halwa.jpg"},
-{name:"Kaju Patisa",price:350,img:"https://upload.wikimedia.org/wikipedia/commons/6/6f/Khoya_sweets.jpg"}
-];
-
-let cart = [];
-
-function showProducts(){
-let html="";
-products.forEach((p,i)=>{
-html+=`
-<div class="card">
-<img src="${p.img}" style="width:100%; height:150px; object-fit:cover; border-radius:5px;">
-<h3>${p.name}</h3>
-<p>₹${p.price} / kg</p>
-<select id="weight-${i}">
-  <option value="0.25">250g</option>
-  <option value="0.5">500g</option>
-  <option value="1">1 kg</option>
-  <option value="5">5 kg</option>
+<select id="payment">
+    <option value="COD">Cash on Delivery</option>
+    <option value="UPI">UPI Payment</option>
 </select>
 
-<button onclick="add(${i})">Add to Cart</button>
+<div id="upiBox" style="display:none; text-align:center;">
+    <p>Scan & Pay</p>
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=yourupi@upi" width="150">
+</div>
+
+<button onclick="placeOrder()">Place Order</button>
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBquJhlCKMaetH2sqop4UyiIAwPrHVWlKM",
+  authDomain: "sikarwar-sweets.firebaseapp.com",
+  projectId: "sikarwar-sweets",
+  storageBucket: "sikarwar-sweets.firebasestorage.app",
+  messagingSenderId: "1079409532421",
+  appId: "1:1079409532421:web:939488d789ed057174866c",
+  measurementId: "G-PVM0CWV7ZT"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let products = [
+{name:"Gulab Jamun",price:250,img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Gulab_jamun.jpg/640px-Gulab_jamun.jpg"},
+{name:"Rasgulla",price:220,img:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Rasgulla.jpg/640px-Rasgulla.jpg"},
+{name:"Kaju Katli",price:800,img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Kaju_katli.jpg/640px-Kaju_katli.jpg"},
+{name:"Ladoo",price:180,img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Boondi_Ladoo.jpg/640px-Boondi_Ladoo.jpg"},
+{name:"Barfi",price:350,img:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Barfi.jpg/640px-Barfi.jpg"},
+{name:"Milk Cake",price:400,img:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Milk_cake.jpg/640px-Milk_cake.jpg"},
+{name:"Soan Papdi",price:250,img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Soan_Papdi.jpg/640px-Soan_Papdi.jpg"}
+];
+
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+function showProducts(list=products){
+let html="";
+list.forEach((p,i)=>{
+html+=`
+<div class="card">
+<img src="${p.img}">
+<h3>${p.name}</h3>
+<p>₹${p.price}/kg</p>
+
+<select id="w-${i}">
+<option value="0.25">250g</option>
+<option value="0.5">500g</option>
+<option value="1">1kg</option>
+</select>
+
+<button onclick="add(${i})">Add</button>
 </div>`;
 });
 document.getElementById("products").innerHTML=html;
 }
 
-function add(i){
-let item = products[i];
-let weight = parseFloat(document.getElementById(`weight-${i}`).value);
+window.add = function(i){
+let weight=parseFloat(document.getElementById(`w-${i}`).value);
+let item=products[i];
 
-let found = cart.find(c => c.name === item.name && c.weight === weight);
+let found=cart.find(c=>c.name===item.name && c.weight===weight);
 
-if(found){
-    found.qty++;
-}else{
-    cart.push({
-        ...item,
-        qty:1,
-        weight:weight
-    });
-}
+if(found) found.qty++;
+else cart.push({...item,qty:1,weight});
 
-update();
+save(); update();
 }
 
 function update(){
-let total=0;
-let html="";
+let html="",total=0;
+
 cart.forEach((item,i)=>{
-total+=item.price*item.qty;
+let t=item.price*item.qty*item.weight;
+total+=t;
 
 html+=`
-<div>
-${item.name} (${item.weight}kg) x${item.qty} = ₹${item.price * item.weight * item.qty}
+<div class="cart-item">
+<b>${item.name}</b><br>
+${item.weight}kg x${item.qty} = ₹${t}<br>
 <button onclick="change(${i},1)">+</button>
 <button onclick="change(${i},-1)">-</button>
+<button onclick="removeItem(${i})">❌</button>
 </div>`;
 });
 
 document.getElementById("cart-items").innerHTML=html;
 document.getElementById("total").innerText=total;
-document.getElementById("count").innerText=cart.length;
+document.getElementById("count").innerText=cart.reduce((s,i)=>s+i.qty,0);
 }
 
-function change(i,val){
+window.change=function(i,val){
 cart[i].qty+=val;
 if(cart[i].qty<=0) cart.splice(i,1);
-update();
+save(); update();
 }
 
-function placeOrder(){
+window.removeItem=function(i){
+cart.splice(i,1);
+save(); update();
+}
+
+window.toggleCart = function(){
+    document.getElementById("cart").classList.toggle("active");
+}
+
+function save(){
+localStorage.setItem("cart",JSON.stringify(cart));
+}
+
+window.search=function(val){
+let filtered=products.filter(p=>p.name.toLowerCase().includes(val.toLowerCase()));
+showProducts(filtered);
+}
+
+window.placeOrder = async function(){
+
+let selectedPayment = document.getElementById("payment").value;
+
 let name=document.getElementById("name").value;
 let address=document.getElementById("address").value;
 let phone=document.getElementById("phone").value;
 
-if(!name || !address || !phone){
+if(cart.length===0){
+alert("Cart is empty");
+return;
+}
+
+if(!name||!address||!phone){
 alert("Fill all details");
 return;
 }
 
-let message = "New Order - Sikarwar Sweets%0A";
-message += "Name: "+name+"%0A";
-message += "Address: "+address+"%0A";
-message += "Phone: "+phone+"%0A%0A";
+let total=cart.reduce((s,i)=>s+i.price*i.weight*i.qty,0);
+
+try{
+let orderText = "New Order - Sikarwar Sweets\n\n";
+
+orderText += "Name - " + name + "\n";
+orderText += "Address - " + address + "\n";
+orderText += "Phone - " + phone + "\n";
+orderText += "Payment - " + selectedPayment + "\n";
+
+orderText += "\n------------------------\n";
 
 cart.forEach(item=>{
-message += item.name+" ("+item.weight+"kg) x"+item.qty+" = ₹"+(item.price*item.weight*item.qty)+"%0A";
+let price = Math.round(item.price * item.weight * item.qty);
+orderText += item.name + " (" + (item.weight*1000) + "g) x" + item.qty + " = ₹" + price + "\n";
 });
 
-let total = cart.reduce((sum,item)=>sum+(item.price*item.weight*item.qty),0);
-message += "%0ATotal: ₹"+total;
+orderText += "------------------------\n";
+orderText += "Total = ₹" + total;
 
-// 🔥 CHANGE THIS NUMBER
-let url = "https://wa.me/9911132308?text="+message;
+await addDoc(collection(db,"orders"),{
+order: orderText,
+total: total,
+payment: selectedPayment,
+date: new Date()
+});
 
-window.open(url,"_blank");
+// WhatsApp
+window.open("https://wa.me/919911132308?text=" + encodeURIComponent(orderText));
+
+alert("✅ Order Placed!");
+
+cart=[];
+save();
+update();
+
+document.getElementById("name").value="";
+document.getElementById("address").value="";
+document.getElementById("phone").value="";
+
+}catch(err){
+alert("❌ "+err.message);
+console.error(err);
+}
+}
+
+window.onload = function(){
+document.getElementById("payment").addEventListener("change",function(){
+let method=this.value;
+document.getElementById("upiBox").style.display = method==="UPI" ? "block" : "none";
+});
 }
 
 showProducts();
+update();
 </script>
 
 </body>
