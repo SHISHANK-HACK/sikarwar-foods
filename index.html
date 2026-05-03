@@ -152,10 +152,10 @@ input{
 
 <div id="upiBox" style="display:none; text-align:center;">
     <p>Scan & Pay</p>
-    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=yourupi@upi" width="150">
-</div>
+    <img src="upi-qr.jpg.jpeg" style="width:200px; height:200px; object-fit:contain; margin-top:10px;">
 
 <button onclick="placeOrder()">Place Order</button>
+
 </div>
 
 <script type="module">
@@ -231,7 +231,7 @@ total+=t;
 html+=`
 <div class="cart-item">
 <b>${item.name}</b><br>
-${item.weight}kg x${item.qty} = ₹${t}<br>
+${item.weight * 1000}g x${item.qty} = ₹${t} x${item.qty} = ₹${t}<br>
 <button onclick="change(${i},1)">+</button>
 <button onclick="change(${i},-1)">-</button>
 <button onclick="removeItem(${i})">❌</button>
@@ -275,20 +275,33 @@ let name=document.getElementById("name").value;
 let address=document.getElementById("address").value;
 let phone=document.getElementById("phone").value;
 
-if(cart.length===0){
-alert("Cart is empty");
-return;
+if(!name || name.trim().length < 3){
+    alert("Enter valid name (min 3 letters)");
+    return;
 }
 
-if(!name||!address||!phone){
-alert("Fill all details");
+
+if(!address || address.trim().length < 10){
+    alert("Enter full address (min 10 letters)");
+    return;
+}
+
+if(!/^[6-9]\d{9}$/.test(phone)){
+    alert("Enter valid Indian phone number");
+    return;
+}
+
+if(cart.length===0){
+alert("Cart is empty");
 return;
 }
 
 let total=cart.reduce((s,i)=>s+i.price*i.weight*i.qty,0);
 
 try{
-let orderText = "New Order - Sikarwar Sweets\n\n";
+
+    let orderId = "SS" + Date.now();
+let orderText = "🧾 Order ID: " + orderId + "\n\nNew Order - Sikarwar Sweets\n\n";
 
 orderText += "Name - " + name + "\n";
 orderText += "Address - " + address + "\n";
@@ -309,6 +322,8 @@ await addDoc(collection(db,"orders"),{
 order: orderText,
 total: total,
 payment: selectedPayment,
+orderId: orderId,
+status: "Placed",
 date: new Date()
 });
 
